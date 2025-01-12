@@ -1,0 +1,11 @@
+# Ambiente virtual
+venv/
+
+# Banco de dados
+lendlib.db
+
+# Configuração de ambiente
+.env
+
+# Arquivos cache do Python
+__pycache__/
