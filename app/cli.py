@@ -1,4 +1,4 @@
-from app.services import criar_usuario, adicionar_livro, registrar_emprestimo, listar_emprestimos
+from app.services import criar_usuario, adicionar_livro, registrar_emprestimo, listar_emprestimos, buscar_livros_google
 
 def menu():
     while True:
@@ -7,7 +7,8 @@ def menu():
         print("2. Adicionar Livro")
         print("3. Registrar Empréstimo")
         print("4. Listar Empréstimos")
-        print("5. Sair")
+        print("5. Buscar Livros (Google Books)")
+        print("6. Sair")
         opcao = input("Escolha uma opção: ")
 
         if opcao == "1":
@@ -15,8 +16,11 @@ def menu():
             nome = input("Digite o nome do usuário: ").strip()
             email = input("Digite o email do usuário: ").strip()
             if nome and email:
-                usuario = criar_usuario(nome, email)
-                print(f"✅ Usuário criado com sucesso: {usuario.nome} ({usuario.email})")
+                try:
+                    usuario = criar_usuario(nome, email)
+                    print(f"✅ Usuário criado com sucesso: {usuario.nome} ({usuario.email})")
+                except Exception as e:
+                    print(f"⚠️ Erro: {e}")
             else:
                 print("⚠️ Nome ou email inválido. Tente novamente.")
         
@@ -25,8 +29,11 @@ def menu():
             titulo = input("Digite o título do livro: ").strip()
             autor = input("Digite o autor do livro: ").strip()
             if titulo and autor:
-                livro = adicionar_livro(titulo, autor)
-                print(f"✅ Livro adicionado com sucesso: '{livro.titulo}' por {livro.autor}")
+                try:
+                    livro = adicionar_livro(titulo, autor)
+                    print(f"✅ Livro adicionado com sucesso: '{livro.titulo}' por {livro.autor}")
+                except Exception as e:
+                    print(f"⚠️ Erro: {e}")
             else:
                 print("⚠️ Título ou autor inválido. Tente novamente.")
         
@@ -53,6 +60,27 @@ def menu():
                     print(f"[ID {emp.id}] Usuário: {emp.usuario.nome} - Livro: {emp.livro.titulo} - Data: {emp.data_emprestimo}")
         
         elif opcao == "5":
+            # Buscar livros na Google Books API
+            query = input("Digite o título ou autor para buscar: ").strip()
+            if query:
+                try:
+                    resultados = buscar_livros_google(query)
+                    if resultados:
+                        print("\n📚 Resultados da Busca:")
+                        for idx, livro in enumerate(resultados, 1):
+                            print(f"{idx}. {livro['titulo']} - Autor(es): {livro['autores']}")
+                            print(f"   Descrição: {livro['descricao']}")
+                            if livro['imagem']:
+                                print(f"   Imagem: {livro['imagem']}")
+                            print("\n")
+                    else:
+                        print("⚠️ Nenhum livro encontrado para a pesquisa.")
+                except Exception as e:
+                    print(f"⚠️ Erro: {e}")
+            else:
+                print("⚠️ Termo de busca inválido. Tente novamente.")
+        
+        elif opcao == "6":
             # Sair do menu
             print("Saindo... 👋")
             break

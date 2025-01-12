@@ -1,5 +1,7 @@
 from app.models import Usuario, Livro, Emprestimo
 from app.database import get_session
+import requests
+import os
 
 
 def criar_usuario(nome, email):
@@ -64,3 +66,30 @@ def listar_emprestimos():
     # Retorna uma lista vazia se não houver empréstimos
     return emprestimos
 
+
+def buscar_livros_google(query, max_results=5):
+    """Busca livros na Google Books API."""
+    api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
+    if not api_key:
+        raise Exception("A chave da API Google Books não está configurada no .env")
+
+    url = f"https://www.googleapis.com/books/v1/volumes?q={query}&maxResults={max_results}&key={api_key}"
+    
+    response = requests.get(url)
+    if response.status_code == 200:
+        livros = response.json().get("items", [])
+        resultados = []
+        for livro in livros:
+            titulo = livro["volumeInfo"].get("title", "Título não disponível")
+            autores = livro["volumeInfo"].get("authors", ["Autor desconhecido"])
+            descricao = livro["volumeInfo"].get("description", "Descrição não disponível")
+            imagem = livro["volumeInfo"].get("imageLinks", {}).get("thumbnail", "")
+            resultados.append({
+                "titulo": titulo,
+                "autores": ", ".join(autores),
+                "descricao": descricao,
+                "imagem": imagem
+            })
+        return resultados
+    else:
+        raise Exception(f"Erro ao buscar livros: {response.status_code}")
