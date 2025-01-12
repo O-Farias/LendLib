@@ -3,6 +3,7 @@ from app.database import get_session
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timezone
 
 # Carregar as variáveis do .env
 load_dotenv()
@@ -27,7 +28,6 @@ def listar_usuarios():
     session = get_session()
     usuarios = session.query(Usuario).all()
     return usuarios
-
 
 def adicionar_livro(titulo, autor):
     """Adiciona um novo livro ao sistema."""
@@ -58,10 +58,14 @@ def registrar_emprestimo(usuario_id, livro_id):
     if not usuario:
         raise Exception(f"Usuário com ID {usuario_id} não encontrado.")
 
+    # Registra o empréstimo
     emprestimo = Emprestimo(usuario_id=usuario_id, livro_id=livro_id)
     livro.disponivel = 0  # Marca o livro como emprestado
     session.add(emprestimo)
     session.commit()
+
+    # Garante que o estado do livro e do empréstimo esteja atualizado
+    session.refresh(livro)
     session.refresh(emprestimo)
     return emprestimo
 
@@ -80,7 +84,7 @@ def buscar_livros_google(query, max_results=5):
         raise Exception("A chave da API Google Books não está configurada no .env")
 
     url = f"https://www.googleapis.com/books/v1/volumes?q={query}&maxResults={max_results}&key={api_key}"
-    
+
     response = requests.get(url)
     if response.status_code == 200:
         livros = response.json().get("items", [])
