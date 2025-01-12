@@ -2,7 +2,10 @@ from app.models import Usuario, Livro, Emprestimo
 from app.database import get_session
 import requests
 import os
+from dotenv import load_dotenv
 
+# Carregar as variáveis do .env
+load_dotenv()
 
 def criar_usuario(nome, email):
     """Cria um novo usuário no sistema."""
@@ -19,6 +22,12 @@ def criar_usuario(nome, email):
     session.refresh(usuario)
     return usuario
 
+def listar_usuarios():
+    """Lista todos os usuários cadastrados."""
+    session = get_session()
+    usuarios = session.query(Usuario).all()
+    return usuarios
+
 
 def adicionar_livro(titulo, autor):
     """Adiciona um novo livro ao sistema."""
@@ -34,7 +43,6 @@ def adicionar_livro(titulo, autor):
     session.commit()
     session.refresh(livro)
     return livro
-
 
 def registrar_emprestimo(usuario_id, livro_id):
     """Registra o empréstimo de um livro."""
@@ -57,7 +65,6 @@ def registrar_emprestimo(usuario_id, livro_id):
     session.refresh(emprestimo)
     return emprestimo
 
-
 def listar_emprestimos():
     """Lista todos os empréstimos registrados."""
     session = get_session()
@@ -65,7 +72,6 @@ def listar_emprestimos():
 
     # Retorna uma lista vazia se não houver empréstimos
     return emprestimos
-
 
 def buscar_livros_google(query, max_results=5):
     """Busca livros na Google Books API."""
