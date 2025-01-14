@@ -56,7 +56,7 @@ LendLib/
 
 1. **Clone o repositório**:
    ```bash
-   git clone https://github.com/seu-usuario/lendlib.git
+   git clone https://github.com/O-Farias/lendlib.git
    cd lendlib
    ```
 
